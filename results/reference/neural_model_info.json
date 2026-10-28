@@ -1,0 +1,27 @@
+[
+  {
+    "held_out_block": 1,
+    "final_loss": 0.01463,
+    "parameters": 32739
+  },
+  {
+    "held_out_block": 2,
+    "final_loss": 0.01484,
+    "parameters": 32739
+  },
+  {
+    "held_out_block": 3,
+    "final_loss": 0.01464,
+    "parameters": 32739
+  },
+  {
+    "held_out_block": 4,
+    "final_loss": 0.0144,
+    "parameters": 32739
+  },
+  {
+    "held_out_block": 5,
+    "final_loss": 0.01499,
+    "parameters": 32739
+  }
+]

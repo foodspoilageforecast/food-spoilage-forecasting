@@ -1,0 +1,99 @@
+{
+  "neural": [
+    {
+      "method": "replicate_attention",
+      "predictions": 18000,
+      "mean_absolute_difference_cm": 0.00017304591503408215,
+      "max_absolute_difference_cm": 0.00269317626953125
+    }
+  ],
+  "baselines": [
+    {
+      "method": "grad_boost",
+      "predictions": 18000,
+      "mean_absolute_difference_cm": 0.0,
+      "max_absolute_difference_cm": 0.0
+    },
+    {
+      "method": "linear",
+      "predictions": 18000,
+      "mean_absolute_difference_cm": 0.0,
+      "max_absolute_difference_cm": 0.0
+    },
+    {
+      "method": "per_cell_gompertz",
+      "predictions": 18000,
+      "mean_absolute_difference_cm": 0.0,
+      "max_absolute_difference_cm": 0.0
+    },
+    {
+      "method": "persistence",
+      "predictions": 18000,
+      "mean_absolute_difference_cm": 0.0,
+      "max_absolute_difference_cm": 0.0
+    },
+    {
+      "method": "replicate_informed_gompertz",
+      "predictions": 18000,
+      "mean_absolute_difference_cm": 0.0,
+      "max_absolute_difference_cm": 0.0
+    }
+  ],
+  "release_date": "2026-10-28",
+  "checkpoint_reload_check": {
+    "predictions": 18000,
+    "exact_match_to_release_predictions": true
+  },
+  "unit_checks": {
+    "passed": 8,
+    "failed": 0
+  },
+  "reference_neural_metrics": [
+    {
+      "method": "replicate_attention",
+      "temperature": "25C",
+      "mae": 0.0290726993216408,
+      "rmse": 0.0530964695397853,
+      "r2": 0.9795738080714448,
+      "bias": 0.0035040621095232,
+      "n": 9000
+    },
+    {
+      "method": "replicate_attention",
+      "temperature": "4C",
+      "mae": 0.0502137288823723,
+      "rmse": 0.0660210793424525,
+      "r2": 0.9877130677460288,
+      "bias": 0.0020634838119149,
+      "n": 9000
+    }
+  ],
+  "release_neural_metrics": [
+    {
+      "method": "replicate_attention",
+      "temperature": "25C",
+      "mae": 0.0290870420932769,
+      "rmse": 0.0531078490990812,
+      "r2": 0.9795650517088288,
+      "bias": 0.003472441567315,
+      "n": 9000
+    },
+    {
+      "method": "replicate_attention",
+      "temperature": "4C",
+      "mae": 0.050230175446305,
+      "rmse": 0.0660436460247429,
+      "r2": 0.9877046667114794,
+      "bias": 0.0019874227734075,
+      "n": 9000
+    }
+  ],
+  "neural_training_epochs_per_fold": 600,
+  "folds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ]
+}

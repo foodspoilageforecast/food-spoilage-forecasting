@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "Please cite the accompanying article when using this software or its measurement data."
+title: "AI-enabled spatiotemporal mapping and forecasting of internal food spoilage"
+type: software
+authors:
+  - family-names: Wang
+    given-names: Dinghan
+repository-code: "https://github.com/foodspoilageforecast/food-spoilage-forecasting"
+url: "https://github.com/foodspoilageforecast/food-spoilage-forecasting"
+version: 1.0.0
+date-released: 2026-10-28
+license: MIT
