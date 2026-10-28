@@ -184,3 +184,6 @@ The release covers the AI analysis. It does not contain the other experimental
 measurements or unpublished manuscript files. Software is distributed under the
 [MIT license](LICENSE). The included measurement data are provided to reproduce
 the accompanying analysis; cite the associated article when using them.
+
+## Contact information
+If you have any questions, please feel free to contact us (chmlx@nus.edu.sg).
