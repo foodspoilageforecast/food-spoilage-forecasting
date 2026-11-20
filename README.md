@@ -27,6 +27,19 @@ hours 25-36. It evaluates prediction for a held-out replicate with reference
 assistance. It does not evaluate a setting in which every piece is observed only
 through hour 24, or generalization to new food categories or temperatures.
 
+## System requirements
+
+- **Operating systems:** tested on macOS 26.4.1 (Apple M3, arm64) and Ubuntu 24.04 LTS
+  (x86-64, GitHub Actions). Other operating systems supported by Python 3.12 and
+  PyTorch 2.10 are expected to work; Windows has not been tested.
+- **Software:** Python 3.12 (tested with 3.12.9) and the pinned versions in
+  `requirements.txt`: numpy 2.4.2, pandas 3.0.0, scipy 1.17.0, scikit-learn 1.8.0,
+  torch 2.10.0, matplotlib 3.10.8, openpyxl 3.1.5 and threadpoolctl 3.6.0.
+- **Hardware:** no non-standard hardware is required. A standard desktop or laptop CPU
+  is sufficient (peak memory about 1.1 GB; about 0.9 GB of disk for the Python
+  environment). A GPU is optional (`--device cuda` or `--device mps`); the release
+  checkpoints in `models/` were trained on a CPU.
+
 ## Installation
 
 Python 3.12 is the tested runtime. CPU execution is the default. Create an isolated
@@ -37,6 +50,22 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
+
+Installation takes about 1–5 min on a normal desktop computer, mostly to download
+PyTorch (29 s on an Apple M3 laptop with a broadband connection).
+
+## Demo
+
+Run these commands from the repository root after installation. Times were measured
+on an Apple M3 laptop using one CPU thread (the default).
+
+| Command | Expected output | Run time |
+| --- | --- | --- |
+| `python -m unittest discover -s tests -v` | `Ran 8 tests ... OK` | ~5 s |
+| `python scripts/prediction/run_experiment.py --neural-only --epochs 2 --folds 1 --output-dir results/smoke` | `results/smoke/` containing `predictions.csv`, the metric tables, `run_metadata.json` and `checkpoints/fold_1.pt`. The printed table shows MAE ≈ 0.14 cm (25 °C) and ≈ 0.22 cm (4 °C); this 2-epoch model is deliberately undertrained, and values can differ slightly across platforms. | ~5 s |
+| `python scripts/prediction/predict.py --checkpoint-dir models` | 18,000 held-out forecasts in `results/checkpoint_predictions/`, with RCA-Gompertz MAE 0.0291 cm (25 °C) and 0.0502 cm (4 °C), matching `models/summary_by_method_temp.csv` | ~4 s |
+| `python scripts/prediction/run_experiment.py` | Full reproduction in `results/reproduced/` (five folds × 600 epochs plus all comparison methods). RCA-Gompertz MAE ≈ 0.029 cm and R² ≈ 0.980 at 25 °C, and MAE ≈ 0.050 cm and R² ≈ 0.988 at 4 °C; comparison-method forecasts identical to `results/reference/` | ~13 min |
+| `python scripts/prediction/compare_results.py` | JSON report of differences from the recorded paper forecasts: mean absolute difference ≈ 2 × 10⁻⁴ cm for RCA-Gompertz and 0 for the comparison methods | a few seconds |
 
 ## Reproduce the analysis
 
@@ -88,6 +117,39 @@ Both commands write fresh predictions and summaries to `results/checkpoint_predi
 See [model documentation](models/README.md) for training provenance and the
 distinction between the recorded paper outputs and the release verification run.
 
+## Running the code on your own data
+
+1. Create a folder with one workbook per food, named `<Food>.xlsx` and laid out as
+   described in [data/README.md](data/README.md): one sheet per storage temperature
+   (for example `4℃` and `25℃`), and one block per hour headed `<Food> <T>℃ (<h> h)`,
+   followed by the columns `x`, `y` and five `z` replicate columns containing depths
+   in cm.
+2. Train and evaluate on these data:
+
+   ```bash
+   python scripts/prediction/run_experiment.py --data-dir path/to/workbooks --output-dir results/my_run
+   ```
+
+3. Or forecast with the released checkpoints:
+
+   ```bash
+   python scripts/prediction/predict.py --checkpoint-dir models --data-dir path/to/workbooks --output-dir results/my_forecasts
+   ```
+
+This release checks that the input follows the published design: Beef, Chicken, Duck,
+Fish, Pork and Shrimp at 4 °C and 25 °C, hourly from 0 to 36 h, a 5 × 5 grid, five
+replicates and depths of 0–3 cm. Other foods, temperatures or durations require
+editing `MEATS` and `TEMPS` in `nn_replicate_attention.py` and `validate_contexts` in
+`run_experiment.py`.
+
+To forecast a new piece whose 25–36 h measurements do not exist yet, copy `data/raw/`
+to a new folder. In the sheet for the piece's food and temperature, put the new piece
+in one replicate column (for example `z (n1)`) with any placeholder depths (0–3 cm) for
+hours 25–36, and keep complete 0–36 h reference trajectories in the other four columns.
+After running `predict.py`, use the rows for that food and temperature whose `fold`
+equals the column number. These forecasts do not depend on the placeholders (checked in
+`tests/test_experiment.py`), but ignore their `true_depth` values and the metrics.
+
 ## Reproduce the AI figure panels
 
 Render the paper's five-method comparison and the measured/predicted 3D blocks:
@@ -129,7 +191,8 @@ AdamW uses an initial learning rate of 0.003, weight decay of 0.0001, cosine
 annealing and gradient clipping. The loss combines weighted absolute error with
 0.3 times weighted squared error. Bounds and monotonicity are enforced on the
 output. See [Methods](docs/methods.md) for the precise information flow, loss,
-normalization, split and metric definitions.
+normalization, split and metric definitions. The [model card](MODEL_CARD.md)
+summarizes intended use, training data, evaluation and limitations.
 
 There are 1,200 cell-level training rows per fold and 18,000 held-out neural
 predictions across five folds. Cells, horizons and folds do not constitute
@@ -161,6 +224,7 @@ averages of fold-level R² values.
 | `scripts/prediction/render_spoilage_3d.py` | Shared two-colour block renderer |
 | `results/reference/` | Recorded paper predictions and summaries |
 | `models/` | Checkpoints from the documented release verification run |
+| `MODEL_CARD.md` | Model card: intended use, training data, evaluation and limitations |
 | `tests/` | Data, split-isolation and model constraint checks |
 
 ## Checks
